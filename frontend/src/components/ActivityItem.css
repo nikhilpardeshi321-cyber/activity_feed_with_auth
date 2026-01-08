@@ -1,0 +1,104 @@
+.activity-item {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+
+.activity-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.activity-item.optimistic {
+  opacity: 0.7;
+  border-color: #3498db;
+  border-style: dashed;
+}
+
+.optimistic-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #3498db;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.activity-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actor-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.activity-type {
+  background-color: #f0f0f0;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.activity-body {
+  color: #666;
+  font-size: 14px;
+}
+
+.entity-id {
+  display: block;
+  margin-bottom: 8px;
+  color: #888;
+  font-size: 13px;
+}
+
+.activity-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.metadata-item {
+  background-color: #f8f8f8;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.metadata-item strong {
+  color: #555;
+  margin-right: 4px;
+}
+
+.activity-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.activity-time {
+  color: #999;
+  font-size: 12px;
+}
+
