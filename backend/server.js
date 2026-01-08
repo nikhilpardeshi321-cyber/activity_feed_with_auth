@@ -25,9 +25,6 @@ mongoose.connect(process.env.MONGODB_URI)
 })
 .catch((err) => console.error('MongoDB connection error:', err));
 
-// Simple health endpoint
-app.get('/api/ping', (req, res) => res.json({ status: 'ok', env: process.env.NODE_ENV || 'development' }));
-
 // Routes
 app.use('/api/activities', activityRoutes);
 app.use('/api/auth', authRoutes);
