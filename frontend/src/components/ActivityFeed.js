@@ -95,14 +95,11 @@ function ActivityFeed({ tenantId, authToken }) {
     if (!tenantId) return;
 
     // Simulate WebSocket connection with polling for demo
-    // In production, use actual WebSocket or SSE
     const pollInterval = setInterval(() => {
-      // Check for new activities (simplified - in production use WebSocket)
       if (activities.length > 0 && !loading) {
         const latestActivity = activities[0];
         const checkTime = new Date(latestActivity.createdAt).getTime();
         
-        // Poll for activities newer than the latest one
         fetch(`${API_BASE_URL}/activities?tenantId=${tenantId}&limit=1`)
           .then(res => res.json())
           .then(data => {
@@ -111,9 +108,8 @@ function ActivityFeed({ tenantId, authToken }) {
               const newTime = new Date(newActivity.createdAt).getTime();
               
               if (newTime > checkTime) {
-                // New activity found, add to top
                 setActivities(prev => {
-                  // Check if already exists (avoid duplicates)
+                  // Check if already exists
                   const exists = prev.some(a => a._id === newActivity._id);
                   if (!exists) {
                     return [newActivity, ...prev];
@@ -125,7 +121,7 @@ function ActivityFeed({ tenantId, authToken }) {
           })
           .catch(err => console.error('Error polling for updates:', err));
       }
-    }, 5000); // Poll every 5 seconds
+    }, 5000);
 
     return () => {
       clearInterval(pollInterval);

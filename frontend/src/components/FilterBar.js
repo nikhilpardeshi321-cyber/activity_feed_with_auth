@@ -79,6 +79,5 @@ function FilterBar({ filter, onFilterChange }) {
   );
 }
 
-// Memoize to prevent unnecessary re-renders
 export default memo(FilterBar);
 

@@ -50,6 +50,5 @@ function ActivityItem({ activity, isOptimistic }) {
   );
 }
 
-// Memoize to prevent unnecessary re-renders
 export default memo(ActivityItem);
 

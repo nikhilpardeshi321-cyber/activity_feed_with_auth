@@ -9,7 +9,6 @@ function App() {
   const [showSignup, setShowSignup] = useState(false);
 
   useEffect(() => {
-    // Load auth from localStorage
     const token = localStorage.getItem('token');
     const tenantId = localStorage.getItem('tenantId');
     const name = localStorage.getItem('name');
