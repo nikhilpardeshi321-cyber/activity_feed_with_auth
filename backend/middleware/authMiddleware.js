@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
 
-// Parse token if present. If valid, attach req.user. If missing/invalid, continue without error.
 const parseToken = (req, res, next) => {
-  // Normalize header access and guard against non-string values
   const rawAuth = req.headers && (req.headers.authorization || req.headers.Authorization);
   if (!rawAuth || typeof rawAuth !== 'string') {
     return next();
