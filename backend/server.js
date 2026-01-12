@@ -14,7 +14,7 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
-// Parse token on /api routes (optional) so controllers can use req.user if provided
+// Parse token middleware
 app.use('/api', authMiddleware.parseToken);
 
 // MongoDB Connection
