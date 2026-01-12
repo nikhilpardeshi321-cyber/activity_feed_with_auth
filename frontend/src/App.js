@@ -59,7 +59,7 @@ function App() {
             <Login onAuth={handleAuth} />
           )
         ) : (
-          <ActivityFeed tenantId={auth.tenantId} authToken={auth.token} />
+          <ActivityFeed tenantId={auth.tenantId} />
         )}
       </main>
     </div>

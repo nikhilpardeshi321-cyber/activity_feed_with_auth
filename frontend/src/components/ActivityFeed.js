@@ -6,7 +6,7 @@ import FilterBar from './FilterBar';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-function ActivityFeed({ tenantId, authToken }) {
+function ActivityFeed({ tenantId }) {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -51,10 +51,8 @@ function ActivityFeed({ tenantId, authToken }) {
         params.append('actorId', filter.actorId);
       }
 
-  const headers = {};
-  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
-  const response = await fetch(`${API_BASE_URL}/activities?${params}`, { headers });
+  // No auth token used here; tenantId is sent as a query param for tenant isolation
+  const response = await fetch(`${API_BASE_URL}/activities?${params}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch activities: ${response.statusText}`);
@@ -76,7 +74,7 @@ function ActivityFeed({ tenantId, authToken }) {
     } finally {
       loadingState(false);
     }
-  }, [tenantId, filter.type, filter.actorName, filter.actorId, authToken]);
+  }, [tenantId, filter.type, filter.actorName, filter.actorId]);
 
   // Initial load - only depends on fetchActivities (which is memoized)
   useEffect(() => {
@@ -163,16 +161,13 @@ function ActivityFeed({ tenantId, authToken }) {
       isOptimistic: true
     };
 
-  // Add optimistically (we don't keep a separate optimistic list)
+  // Add optimistically
     setActivities(prev => [optimisticActivity, ...prev]);
 
     try {
-      const headers = { 'Content-Type': 'application/json' };
-      if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
       const response = await fetch(`${API_BASE_URL}/activities`, {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(activityData),
       });
 
@@ -182,7 +177,7 @@ function ActivityFeed({ tenantId, authToken }) {
 
       const createdActivity = await response.json();
 
-      // Replace optimistic entry with the real persisted activity
+      // Replace optimistic entry with the real activity
       setActivities(prev => {
         const filtered = prev.filter(a => a._id !== tempId);
         return [createdActivity, ...filtered];
@@ -194,20 +189,17 @@ function ActivityFeed({ tenantId, authToken }) {
   setFailedOptimisticIds(prev => new Set([...prev, tempId]));
       setActivities(prev => prev.filter(a => a._id !== tempId));
       
-      // Show error to user
       setError(`Failed to create activity: ${error.message}. Please try again.`);
       
-      // Clear error after 5 seconds
       setTimeout(() => setError(null), 5000);
     }
-  }, [authToken]);
+  }, []);
 
-  // Filter handler
   const handleFilterChange = useCallback((newFilter) => {
     setFilter(newFilter);
   }, []);
 
-  // Combine activities with optimistic ones (filter out failed ones)
+  // Combine activities with optimistic ones
   const displayActivities = activities.filter(
     a => !failedOptimisticIds.has(a._id)
   );
