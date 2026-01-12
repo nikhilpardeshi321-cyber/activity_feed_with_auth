@@ -15,12 +15,10 @@ function ActivityFeed({ tenantId, authToken }) {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState({ type: '', actorName: '', actorId: '' });
   
-  // For optimistic updates
-  const [optimisticActivities, setOptimisticActivities] = useState([]);
+  // For optimistic updates (we track failed optimistic ids only)
   const [failedOptimisticIds, setFailedOptimisticIds] = useState(new Set());
   
-  // For real-time updates (mock WebSocket)
-  const wsRef = useRef(null);
+  // For real-time updates (mock WebSocket polling)
   const reconnectTimeoutRef = useRef(null);
 
   // Memoized fetch function to prevent unnecessary re-renders
@@ -78,14 +76,13 @@ function ActivityFeed({ tenantId, authToken }) {
     } finally {
       loadingState(false);
     }
-  }, [tenantId, filter.type, filter.actorName, filter.actorId]);
+  }, [tenantId, filter.type, filter.actorName, filter.actorId, authToken]);
 
   // Initial load - only depends on fetchActivities (which is memoized)
   useEffect(() => {
     setActivities([]);
     setCursor(null);
     setHasMore(true);
-    setOptimisticActivities([]);
     setFailedOptimisticIds(new Set());
     fetchActivities(null, false);
   }, [fetchActivities]);
@@ -125,8 +122,9 @@ function ActivityFeed({ tenantId, authToken }) {
 
     return () => {
       clearInterval(pollInterval);
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
+      const rt = reconnectTimeoutRef.current;
+      if (rt) {
+        clearTimeout(rt);
       }
     };
   }, [tenantId, activities, loading]);
@@ -164,8 +162,7 @@ function ActivityFeed({ tenantId, authToken }) {
       isOptimistic: true
     };
 
-    // Add optimistically
-    setOptimisticActivities(prev => [...prev, optimisticActivity]);
+  // Add optimistically (we don't keep a separate optimistic list)
     setActivities(prev => [optimisticActivity, ...prev]);
 
     try {
@@ -184,8 +181,7 @@ function ActivityFeed({ tenantId, authToken }) {
 
       const createdActivity = await response.json();
 
-      // Remove optimistic activity and replace with real one
-      setOptimisticActivities(prev => prev.filter(a => a._id !== tempId));
+      // Replace optimistic entry with the real persisted activity
       setActivities(prev => {
         const filtered = prev.filter(a => a._id !== tempId);
         return [createdActivity, ...filtered];
@@ -193,9 +189,8 @@ function ActivityFeed({ tenantId, authToken }) {
     } catch (error) {
       console.error('Error creating activity:', error);
       
-      // Rollback: Remove optimistic activity
-      setFailedOptimisticIds(prev => new Set([...prev, tempId]));
-      setOptimisticActivities(prev => prev.filter(a => a._id !== tempId));
+  // Rollback: Remove optimistic activity
+  setFailedOptimisticIds(prev => new Set([...prev, tempId]));
       setActivities(prev => prev.filter(a => a._id !== tempId));
       
       // Show error to user
@@ -204,7 +199,7 @@ function ActivityFeed({ tenantId, authToken }) {
       // Clear error after 5 seconds
       setTimeout(() => setError(null), 5000);
     }
-  }, []);
+  }, [authToken]);
 
   // Filter handler
   const handleFilterChange = useCallback((newFilter) => {

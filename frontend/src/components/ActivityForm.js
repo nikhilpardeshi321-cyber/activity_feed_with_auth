@@ -84,10 +84,10 @@ function ActivityForm({ tenantId: propTenantId, onCreateActivity }) {
     } finally {
       setSubmitting(false);
     }
-  }, [formData, onCreateActivity]);
+  }, [formData, onCreateActivity, propTenantId]);
 
   // If propTenantId changes, keep form in sync
-  React.useEffect(() => {
+  useEffect(() => {
     if (propTenantId) {
       setFormData(prev => ({ ...prev, tenantId: propTenantId }));
     }
