@@ -120,13 +120,14 @@ function ActivityFeed({ tenantId, authToken }) {
       }
     }, 5000);
 
-    return () => {
-      clearInterval(pollInterval);
-      const rt = reconnectTimeoutRef.current;
-      if (rt) {
-        clearTimeout(rt);
-      }
-    };
+  const reconnectTimeout = reconnectTimeoutRef.current;
+
+  return () => {
+    clearInterval(pollInterval);
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+    }
+  };
   }, [tenantId, activities, loading]);
 
   // Infinite scroll handler
